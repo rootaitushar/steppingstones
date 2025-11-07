@@ -95,13 +95,18 @@ export default function Contact() {
       </section>
 
       {/* Contact Form */}
-      <section className="pb-20">
+      <section className="relative pb-20">
+        <div className="absolute inset-0 pointer-events-none flex justify-center" style={{ transform: "translateY(-50px)" }}>
+          <div className="relative w-full max-w-4xl flex justify-center" style={{ height: "100%" }}>
+            <div className="absolute right-8 top-6 bottom-1 w-[80%] rounded-[28px] bg-primary/90" />
+          </div>
+        </div>
         <div className="container mx-auto px-4">
-          <motion.div {...fadeInUp} className="max-w-3xl mx-auto">
-            <Card className="p-8 md:p-12">
-              <h2 className="text-3xl font-bold mb-6 text-primary text-center">Get in Touch</h2>
-              <p className="text-muted-foreground text-center mb-8">
-                Whether you're seeking a youth mentoring initiative, a staff development series, or an
+          <motion.div {...fadeInUp} className="max-w-3xl mx-auto relative">
+            <Card className="p-8 md:p-12 shadow-2xl border border-primary/10">
+                <h2 className="text-3xl font-bold mb-6 text-primary text-center">Get in Touch</h2>
+                <p className="text-muted-foreground text-center mb-8">
+                  Whether you're seeking a youth mentoring initiative, a staff development series, or an
                 educational travel experience, our team is ready to help you design and deliver an effective
                 program. Please complete the form below and a member of our team will respond within two business
                 days.
