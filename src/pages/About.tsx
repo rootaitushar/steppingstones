@@ -83,6 +83,7 @@ export default function About() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
+              className="md:shadow-xl md:bg-white/90 md:rounded-2xl md:p-8 md:border md:border-primary/10"
             >
               <h2 className="text-4xl font-bold mb-6 text-primary">Our Story</h2>
               <p className="text-lg text-muted-foreground mb-4">
