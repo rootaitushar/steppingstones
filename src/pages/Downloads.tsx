@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Download, FileText, Award, Users, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import catalogPdf from "@/assets/Catalog.pdf";
 import { toast } from "sonner";
 
 const fadeInUp = {
@@ -47,7 +48,15 @@ const differentiators = [
 
 export default function Downloads() {
   const handleDownload = () => {
-    toast.info("Download functionality will be implemented with your uploaded files");
+    const link = document.createElement("a");
+    link.href = catalogPdf;
+    link.download = "Catalog.pdf";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Catalog download started");
   };
 
   return (

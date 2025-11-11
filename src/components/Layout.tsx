@@ -108,10 +108,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div>
               <h3 className="font-semibold mb-4">Contact</h3>
               <div className="space-y-2 text-sm opacity-90">
-                <p>Washington, DC • Baltimore, MD</p>
-                <p>(202) 379-4740</p>
-                <p>(410) 630-1328</p>
-                <p>info@stepms.com</p>
+                <p>Washington, DC • </p>
+                <p>(202) 6302084</p>
+                
+                <p>admin@stepms.com</p>
                 <p>www.StepMS.com</p>
               </div>
             </div>

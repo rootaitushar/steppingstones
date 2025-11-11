@@ -23,7 +23,7 @@ const contactInfo = [
   {
     icon: Phone,
     title: "Phone",
-    detail: "(202) 345-0282",
+    detail: "(202) 6302084",
   },
   {
     icon: Mail,
@@ -188,7 +188,7 @@ export default function Contact() {
             <p className="text-lg text-muted-foreground">
               You can also reach us directly at{" "}
               <a href="tel:2023450282" className="text-primary hover:underline font-semibold">
-                (202) 345-0282
+                (202) 6302084
               </a>{" "}
               or{" "}
               <a href="mailto:admin@stepms.com" className="text-primary hover:underline font-semibold">

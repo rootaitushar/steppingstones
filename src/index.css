@@ -108,3 +108,40 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .wp-content {
+    @apply text-lg leading-relaxed text-muted-foreground space-y-6;
+  }
+
+  .wp-content h1,
+  .wp-content h2,
+  .wp-content h3,
+  .wp-content h4 {
+    @apply text-primary font-semibold mt-10;
+  }
+
+  .wp-content p {
+    @apply text-muted-foreground;
+  }
+
+  .wp-content a {
+    @apply text-primary underline;
+  }
+
+  .wp-content ul {
+    @apply list-disc space-y-2 pl-6;
+  }
+
+  .wp-content ol {
+    @apply list-decimal space-y-2 pl-6;
+  }
+
+  .wp-content img {
+    @apply rounded-2xl my-8;
+  }
+
+  .wp-content blockquote {
+    @apply border-l-4 border-primary/30 pl-4 italic text-primary;
+  }
+}

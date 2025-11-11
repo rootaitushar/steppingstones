@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Users, Globe, Award } from "lucide-react";
@@ -9,6 +9,14 @@ import culturalTrip from "@/assets/cultural-trip.jpg";
 import communityImage from "@/assets/community.jpg";
 import mentoringImage from "@/assets/mentoring.jpg";
 import { cn } from "@/lib/utils";
+import {
+  WPPost,
+  stripHTML,
+  formatPostDate,
+  getFeaturedImage,
+  WORDPRESS_API_URL,
+  POSTS_PER_PAGE,
+} from "@/lib/wordpress";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
@@ -92,6 +100,11 @@ const whoWeAreContent = [
 
 export default function Home() {
   const whoWeAreRef = useRef<HTMLDivElement | null>(null);
+  const [posts, setPosts] = useState<WPPost[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postsError, setPostsError] = useState<string | null>(null);
   const { scrollYProgress } = useScroll({
     target: whoWeAreRef,
     offset: ["start center", "end end"],
@@ -106,6 +119,53 @@ export default function Home() {
   const clientRows = Array.from({ length: Math.ceil(clients.length / clientsPerRow) }, (_, rowIndex) =>
     clients.slice(rowIndex * clientsPerRow, rowIndex * clientsPerRow + clientsPerRow),
   );
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function fetchPosts() {
+      try {
+        setPostsLoading(true);
+        setPostsError(null);
+        const response = await fetch(
+          `${WORDPRESS_API_URL}?per_page=${POSTS_PER_PAGE}&page=${currentPage}&_embed`,
+          { signal: controller.signal },
+        );
+
+        if (!response.ok) {
+          throw new Error("Unable to load the latest posts right now.");
+        }
+
+        const totalPagesHeader = response.headers.get("X-WP-TotalPages");
+        setTotalPages(totalPagesHeader ? Math.max(parseInt(totalPagesHeader, 10) || 1, 1) : 1);
+
+        const data: WPPost[] = await response.json();
+        setPosts(data);
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error(error);
+          setPostsError("Unable to load the latest posts right now. Please try again later.");
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setPostsLoading(false);
+        }
+      }
+    }
+
+    fetchPosts();
+
+    return () => controller.abort();
+  }, [currentPage]);
+
+  const handlePageChange = (direction: "prev" | "next") => {
+    setCurrentPage((prev) => {
+      if (direction === "prev") {
+        return prev > 1 ? prev - 1 : prev;
+      }
+      return prev < totalPages ? prev + 1 : prev;
+    });
+  };
 
   return (
     <div className="overflow-hidden">
@@ -126,7 +186,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
-              className="text-5xl md:text-7xl font-bold mb-6"
+              className="text-5xl md:text-6xl font-bold mb-3"
             >
               Building Pathways. Inspiring Growth. Strengthening Communities.
             </motion.h1>
@@ -428,7 +488,7 @@ export default function Home() {
                       key={client}
                       whileHover={{ scale: 1.04 }}
                       transition={{ type: "spring", stiffness: 250, damping: 15 }}
-                      className="bg-white/10 p-4 rounded-lg text-center text-sm font-medium border border-white/20 shadow-sm hover:shadow-lg transition-all"
+                      className="bg-white/10 p-4 rounded-lg text-center text-sm font-medium border border-white/20 text-primary-foreground shadow-sm hover:shadow-lg transition-all"
                     >
                       {client}
                     </motion.div>
@@ -501,12 +561,116 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Latest News */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <motion.div {...fadeInUp} className="max-w-3xl mx-auto text-center mb-14">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-primary">Latest From StepMS</h2>
+            <p className="text-lg text-muted-foreground">
+              Fresh perspectives and updates from our WordPress blog, pulled in real time so you never miss the
+              latest insights.
+            </p>
+          </motion.div>
+
+          {postsError ? (
+            <div className="text-center text-destructive font-medium">{postsError}</div>
+          ) : postsLoading ? (
+            <div className="flex justify-center py-16">
+              <div className="h-16 w-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+            </div>
+          ) : posts.length > 0 ? (
+            <>
+              <div className="grid gap-8 md:grid-cols-2">
+                {posts.map((post, index) => {
+                  const featuredImage = getFeaturedImage(post);
+                  const excerpt = stripHTML(post.excerpt?.rendered ?? "");
+                  const truncatedExcerpt = excerpt.length > 220 ? `${excerpt.slice(0, 217).trimEnd()}...` : excerpt;
+                  return (
+                    <motion.article
+                      key={post.id}
+                      initial={{ opacity: 0, y: 40 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.3 }}
+                      transition={{ duration: 0.6, delay: index * 0.05 }}
+                      className="flex flex-col overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-xl shadow-primary/5 hover:-translate-y-1 hover:shadow-2xl transition-all"
+                    >
+                      {featuredImage && (
+                        <div className="h-56 overflow-hidden">
+                          <img src={featuredImage} alt={post.title.rendered} className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+                        </div>
+                      )}
+                      <div className="flex flex-col flex-1 p-6 gap-4">
+                        <p className="text-sm font-semibold uppercase tracking-[0.15em] text-primary/70">
+                          {formatPostDate(post.date)}
+                        </p>
+                        <h3
+                          className="text-2xl font-bold text-primary"
+                          dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+                        />
+                        <p className="text-muted-foreground">{truncatedExcerpt}</p>
+                        <div className="mt-auto">
+                          <Link
+                            to={`/posts/${post.id}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center text-primary font-semibold group"
+                          >
+                            Read Full Story
+                            <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" />
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.article>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange("prev")}
+                    disabled={currentPage === 1 || postsLoading}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange("next")}
+                    disabled={currentPage === totalPages || postsLoading}
+                  >
+                    Next
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </p>
+              </div>
+            </>
+          ) : (
+            <div className="text-center text-muted-foreground">No posts found.</div>
+          )}
+        </div>
+      </section>
+
       {/* Looking Forward */}
-      <section className="py-20 bg-primary text-primary-foreground">
+      <motion.section
+        initial={{ opacity: 0, y: 80, scale: 0.98 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative overflow-hidden pt-20 pb-28 bg-white text-primary shadow-2xl shadow-primary/15 rounded-[32px] mx-4 sm:mx-8 lg:mx-16 mb-16 sm:mb-24 transition-all duration-700 hover:-translate-y-2 hover:shadow-[0_35px_90px_rgba(15,23,42,0.2)]"
+      >
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/10"
+          animate={{ scale: [1, 1.05, 1], rotate: [0, 1.5, -1.5, 0], opacity: [0.4, 0.6, 0.4] }}
+          transition={{ duration: 18, repeat: Infinity, repeatType: "mirror" }}
+        />
         <div className="container mx-auto px-4 text-center">
           <motion.div {...fadeInUp} className="max-w-4xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Looking Forward</h2>
-            <p className="text-lg opacity-95 mb-8">
+            <p className="text-lg text-primary/80 mb-8">
               From our beginnings in tutoring and mentoring to our expansion into educational programming,
               staffing, and curated travel, Steppingstones Management Services continues to evolve — always
               grounded in the same mission: helping people and communities grow through education and experience.
@@ -514,13 +678,13 @@ export default function Home() {
             <motion.div className="relative inline-flex">
               <motion.span
                 aria-hidden
-                className="pointer-events-none absolute -inset-px rounded-[999px] bg-gradient-to-r from-white/40 via-secondary/60 to-white/40 blur-lg opacity-0"
+                className="pointer-events-none absolute -inset-px rounded-[999px] bg-gradient-to-r from-primary/20 via-primary/60 to-primary/20 blur-lg opacity-0"
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: [0, 1, 0], scale: [0.85, 1.12, 1] }}
                 transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1 }}
               />
               <Link to="/contact">
-                <Button size="lg" variant="secondary" className="group relative overflow-hidden">
+                <Button size="lg" variant="default" className="group relative overflow-hidden bg-primary text-primary-foreground hover:bg-primary/90">
                   <motion.span
                     aria-hidden
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
@@ -537,7 +701,7 @@ export default function Home() {
             </motion.div>
           </motion.div>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }
