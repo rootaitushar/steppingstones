@@ -566,10 +566,6 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <motion.div {...fadeInUp} className="max-w-3xl mx-auto text-center mb-14">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-primary">Latest From StepMS</h2>
-            <p className="text-lg text-muted-foreground">
-              Fresh perspectives and updates from our WordPress blog, pulled in real time so you never miss the
-              latest insights.
-            </p>
           </motion.div>
 
           {postsError ? (
