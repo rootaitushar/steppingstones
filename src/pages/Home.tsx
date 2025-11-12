@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Users, Globe, Award } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import heroImage from "@/assets/hero-education.jpg";
@@ -95,6 +96,62 @@ const whoWeAreContent = [
       "Our work reflects a belief that education is not just what happens in classrooms, it’s about the relationships, environments, and experiences that help people thrive.",
     image: culturalTrip,
     reverse: false,
+  },
+];
+
+type FeaturedProgram = {
+  id: string;
+  label: "Past Programs" | "Upcoming Programs";
+  heading: string;
+  description: string;
+  timeframe: string;
+  highlights: string[];
+  image: string;
+  cta: {
+    to: string;
+    label: string;
+  };
+  icon: LucideIcon;
+};
+
+const featuredPrograms: FeaturedProgram[] = [
+  {
+    id: "ghana-2025",
+    label: "Past Programs",
+    heading: "Featured Impact: Ghana Cultural Immersion Experience",
+    description:
+      "In July 2025, StepMS led a curated trip to Ghana for young men. It was a transformative journey focused on cultural heritage, leadership, and identity development.",
+    timeframe: "Completed July 2025",
+    highlights: [
+      "Explored Accra, Cape Coast, and historical landmarks with local historians",
+      "Daily mentoring circles centered on leadership, identity, and community",
+      "Service learning with youth development partners and cultural storytellers",
+    ],
+    image: culturalTrip,
+    cta: {
+      to: "/programs",
+      label: "See Past Program Highlights",
+    },
+    icon: Award,
+  },
+  {
+    id: "global-bridge-2026",
+    label: "Upcoming Programs",
+    heading: "On the Horizon: Global Bridge Leadership Intensive",
+    description:
+      "We are preparing the next cohort experience that blends pre-trip leadership coaching with an immersive cultural residency. The program expands our mentoring, travel, and college-career connections into one pathway.",
+    timeframe: "Launching Spring 2026 • Interest list now open",
+    highlights: [
+      "Hybrid preparation sessions that build cultural competence before departure",
+      "Mentoring pods that connect college students, educators, and community partners",
+      "Capstone presentations to share learning with sponsoring schools and families",
+    ],
+    image: mentoringImage,
+    cta: {
+      to: "/contact",
+      label: "Join the Interest List",
+    },
+    icon: Globe,
   },
 ];
 
@@ -507,57 +564,100 @@ export default function Home() {
 
       {/* Featured Impact */}
       <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <Award className="w-12 h-12 text-primary mb-4" />
-              <h2 className="text-4xl font-bold mb-6 text-primary">
-                Featured Impact: Ghana Cultural Immersion Experience
-              </h2>
-              <p className="text-lg text-muted-foreground mb-6">
-                In July 2025, StepMS led a curated trip to Ghana for young men. It was a transformative journey
-                focused on cultural heritage, leadership, and identity development.
-              </p>
-              <motion.div className="relative inline-flex mt-2">
-                <motion.span
-                  aria-hidden
-                  className="pointer-events-none absolute -inset-px rounded-[999px] bg-gradient-to-r from-primary/30 via-secondary/40 to-primary/30 blur-md opacity-0"
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: [0, 1, 0], scale: [0.85, 1.1, 1] }}
-                  transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 1.2 }}
-                />
-                <Link to="/programs">
-                  <Button className="group relative overflow-hidden">
-                    <motion.span
-                      aria-hidden
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/35 to-transparent"
-                      initial={{ x: "-140%" }}
-                      animate={{ x: "140%" }}
-                      transition={{ duration: 1.7, repeat: Infinity, repeatDelay: 1.1 }}
-                    />
-                    <span className="relative flex items-center">
-                      Learn More About Our Educational Trips
-                      <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  </Button>
-                </Link>
+        <div className="container mx-auto px-4 space-y-16">
+          {featuredPrograms.map((program, index) => {
+            const isEven = index % 2 === 0;
+            const badgeClasses =
+              program.label === "Past Programs"
+                ? "bg-primary/10 text-primary border border-primary/20"
+                : "bg-emerald-50 text-emerald-700 border border-emerald-200";
+
+            const textContent = (
+              <motion.div
+                key={`${program.id}-text`}
+                initial={{ opacity: 0, x: isEven ? -40 : 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="space-y-5"
+              >
+                <program.icon className="w-12 h-12 text-primary mb-4" />
+                <span
+                  className={`inline-flex items-center rounded-full px-4 py-1.5 text-xs font-semibold tracking-[0.25em] uppercase ${badgeClasses}`}
+                >
+                  {program.label}
+                </span>
+                <h2 className="text-4xl font-bold text-primary">{program.heading}</h2>
+                <p className="text-lg text-muted-foreground">{program.description}</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary/70">{program.timeframe}</p>
+                <ul className="space-y-2 text-muted-foreground">
+                  {program.highlights.map((highlight) => (
+                    <li key={highlight} className="flex items-start gap-3">
+                      <span className="mt-2 inline-block h-2 w-2 rounded-full bg-primary" />
+                      <span>{highlight}</span>
+                    </li>
+                  ))}
+                </ul>
+                <motion.div className="relative inline-flex mt-2">
+                  <motion.span
+                    aria-hidden
+                    className="pointer-events-none absolute -inset-px rounded-[999px] bg-gradient-to-r from-primary/30 via-secondary/40 to-primary/30 blur-md opacity-0"
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: [0, 1, 0], scale: [0.85, 1.1, 1] }}
+                    transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 1.2 }}
+                  />
+                  <Link to={program.cta.to}>
+                    <Button className="group relative overflow-hidden">
+                      <motion.span
+                        aria-hidden
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/35 to-transparent"
+                        initial={{ x: "-140%" }}
+                        animate={{ x: "140%" }}
+                        transition={{ duration: 1.7, repeat: Infinity, repeatDelay: 1.1 }}
+                      />
+                      <span className="relative flex items-center">
+                        {program.cta.label}
+                        <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    </Button>
+                  </Link>
+                </motion.div>
               </motion.div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="relative rounded-2xl overflow-hidden shadow-2xl"
-            >
-              <img src={culturalTrip} alt="Ghana cultural trip" className="w-full h-auto" />
-            </motion.div>
-          </div>
+            );
+
+            const imageContent = (
+              <motion.div
+                key={`${program.id}-image`}
+                initial={{ opacity: 0, x: isEven ? 40 : -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="relative rounded-2xl overflow-hidden shadow-2xl"
+              >
+                <img
+                  src={program.image}
+                  alt={program.heading}
+                  className="w-full h-full object-cover min-h-[320px]"
+                />
+              </motion.div>
+            );
+
+            return (
+              <div key={program.id} className="grid md:grid-cols-2 gap-12 items-center">
+                {isEven ? (
+                  <>
+                    {textContent}
+                    {imageContent}
+                  </>
+                ) : (
+                  <>
+                    {imageContent}
+                    {textContent}
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
