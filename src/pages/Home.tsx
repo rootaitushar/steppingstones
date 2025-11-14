@@ -9,6 +9,7 @@ import heroImage from "@/assets/hero-education.jpg";
 import culturalTrip from "@/assets/cultural-trip.jpg";
 import communityImage from "@/assets/community.jpg";
 import mentoringImage from "@/assets/mentoring.jpg";
+import speakingImage from "@/assets/Speaking.png";
 import { cn } from "@/lib/utils";
 import {
   WPPost,
@@ -146,7 +147,7 @@ const featuredPrograms: FeaturedProgram[] = [
       "Mentoring pods that connect college students, educators, and community partners",
       "Capstone presentations to share learning with sponsoring schools and families",
     ],
-    image: mentoringImage,
+    image: speakingImage,
     cta: {
       to: "/contact",
       label: "Join the Interest List",

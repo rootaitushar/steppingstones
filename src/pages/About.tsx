@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Shield, Users, Globe, Award, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import communityImage from "@/assets/community.jpg";
+import aboutImage from "@/assets/Yao-Tyus.jpg";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
@@ -113,13 +113,7 @@ export default function About() {
                 animate={{ rotate: [0, 5, -5, 0] }}
                 transition={{ duration: 12, repeat: Infinity, repeatType: "mirror" }}
               />
-              <motion.img
-                src={communityImage}
-                alt="Educational community"
-                className="w-full h-auto relative"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 6, repeat: Infinity, repeatType: "mirror" }}
-              />
+              <img src={aboutImage} alt="Educational community" className="w-full h-auto relative" />
             </motion.div>
           </div>
         </div>
