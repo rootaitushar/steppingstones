@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Quote, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
+import { Link } from "react-router-dom";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 40 },
@@ -149,16 +150,16 @@ export default function Testimonials() {
               your students and community.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <a href="/contact">
+              <Link to="/contact">
                 <button className="px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity">
                   Get Started Today
                 </button>
-              </a>
-              <a href="/programs">
+              </Link>
+              <Link to="/programs">
                 <button className="px-8 py-4 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary/5 transition-colors">
                   View Our Programs
                 </button>
-              </a>
+              </Link>
             </div>
           </motion.div>
         </div>
